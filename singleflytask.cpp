@@ -23,20 +23,20 @@ SingleFlyTask::~SingleFlyTask()
 
 void SingleFlyTask::run()
 {
-    timeConter.start();
+    timeCounter.start();
     cellsPassed = 0;
 
-    while(!stopFlag && timeConter.elapsed() < lifetime)
+    while(!stopFlag && timeCounter.elapsed() < lifetime)
     {
         int waitTime = randomGenerator->bounded(stupidity);
         while(waitTime > 0)
         {
             QThread::msleep(unsigned(qMin(waitTime, 200)));
-            if(stopFlag || timeConter.elapsed() >= lifetime)
+            if(stopFlag || timeCounter.elapsed() >= lifetime)
                 break;
             waitTime -= 200;
         }
-        if(stopFlag || timeConter.elapsed() >= lifetime)
+        if(stopFlag || timeCounter.elapsed() >= lifetime)
             break;
 
         int destCellCode = randomGenerator->bounded(adjacentCellsCount());
@@ -51,7 +51,7 @@ void SingleFlyTask::run()
             cellsPassed++;
         }
     }
-    int elapsedTime = timeConter.elapsed();
+    int elapsedTime = timeCounter.elapsed();
     if(elapsedTime >= lifetime)
         model->killFly(ID);
     model->setFlyLifeAndRouteInfo(ID, elapsedTime, cellsPassed);

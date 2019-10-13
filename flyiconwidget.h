@@ -5,6 +5,9 @@
 
 #include <QLabel>
 
+/**
+ * @brief The FlyIconWidget class Класс виджета, отображающего муху на поле
+ */
 class FlyIconWidget : public QLabel
 {
     Q_OBJECT
