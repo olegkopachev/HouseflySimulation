@@ -5,6 +5,7 @@
 #include "settingsdialog.h"
 
 #include <QMainWindow>
+#include <QTextBrowser>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,9 @@ public:
     ~MainWindow();
 
     void setModel(DataModel *dataModel);
+
+protected:
+    void updateOverallInfoLabel();
 
 signals:
     void setFieldSizeRequest(int fieldSize);
@@ -41,6 +45,7 @@ public slots:
 private slots:
 
     void setNewSettings();
+    void restoreOldSettings();
 
     void on_settingsButton_clicked();
 
@@ -52,14 +57,21 @@ private slots:
 
     void setAddFlyMode(bool mode);
 
+    void on_statisticsButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     SettingsDialog settingsDialog;
 
+    SettingsDialog::Settings currentSettings;
+    QTextBrowser statisticsViewer;
+
     bool isFieldSizeSet = false;
     bool simulationRunning = false;
     bool isInAddFlyMode = false;
+    int flyCounter = 0;
+    int deadFlyCounter = 0;
 
     const DataModel *model;
 };

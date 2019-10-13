@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
 
+#include <QTextBrowser>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -9,14 +11,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     ui->overallInfoLabel->setText(tr("Настройки игры не установлены"));
-    ui->hintLabel->setText("Для начала симуляции нажмите кнопку \"Настройки\" и задайте параметры");
+    ui->hintLabel->setText(tr("Для начала симуляции нажмите кнопку \"Настройки\" и задайте параметры"));
     ui->startStopButton->setEnabled(false);
     ui->resetButton->setEnabled(false);
     ui->addFlyButton->setEnabled(false);
+    ui->statisticsButton->setEnabled(false);
+
+    statisticsViewer.setWindowTitle("Статистика по мухам");
 
     connect(ui->flySimulationWidget, SIGNAL(addNewFlyRequest(int, int, int)), this, SIGNAL(addNewFlyRequest(int, int, int)));
     connect(ui->flySimulationWidget, SIGNAL(flyModeChanged(bool)), this, SLOT(setAddFlyMode(bool)));
     connect(&settingsDialog, SIGNAL(accepted()), this, SLOT(setNewSettings()));
+    connect(&settingsDialog, SIGNAL(rejected()), this, SLOT(restoreOldSettings()));
 }
 
 MainWindow::~MainWindow()
@@ -29,9 +35,18 @@ void MainWindow::setModel(DataModel *dataModel)
     model = dataModel;
 }
 
+void MainWindow::updateOverallInfoLabel()
+{
+    QString overallInfo = tr("Размер поля: %1x%1\nМухоёмкость: %2\nОбщее количество мух: %3\nИз них дохлых: %4").
+            arg(currentSettings.fieldSize).arg(currentSettings.flyCapacity).arg(flyCounter).arg(deadFlyCounter);
+    ui->overallInfoLabel->setText(overallInfo);
+}
+
 void MainWindow::addNewFly(int flyID, int cellX, int cellY, int stupidity)
 {
     ui->flySimulationWidget->addNewFly(flyID, cellX, cellY, stupidity);
+    flyCounter++;
+    updateOverallInfoLabel();
 }
 
 void MainWindow::moveFly(int flyID, int destCellX, int destCellY)
@@ -42,42 +57,59 @@ void MainWindow::moveFly(int flyID, int destCellX, int destCellY)
 void MainWindow::killFly(int flyID)
 {
     ui->flySimulationWidget->killFly(flyID);
+    deadFlyCounter++;
+    updateOverallInfoLabel();
 }
 
 void MainWindow::onSimulationStopped()
 {
     ui->resetButton->setEnabled(true);
+    ui->statisticsButton->setEnabled(true);
     const QMap<int, DataModel::FlyInformation> &fliesInfo = model->getFliesInfo();
     ui->flySimulationWidget->setFliesInfo(fliesInfo);
+    ui->hintLabel->setText(tr("Симуляция остановлена. Вы можете посмотреть статистику по всем мухам, нажав на кнопку \"Статистика\" или по каждой отдельной мухе, нажав на её иконку"));
 }
 
 void MainWindow::onModelReset()
 {
+    flyCounter = 0;
+    deadFlyCounter = 0;
     ui->flySimulationWidget->reset();
     ui->startStopButton->setEnabled(true);
     ui->addFlyButton->setEnabled(true);
+    ui->statisticsButton->setEnabled(false);
+    ui->hintLabel->setText(tr("Добавьте на поле мух и нажмите кнопку \"Старт\""));
+    updateOverallInfoLabel();
 }
 
 void MainWindow::setNewSettings()
 {
-    SettingsDialog::Settings settings = settingsDialog.getSettings();
+    currentSettings = settingsDialog.getSettings();
 
     if(!isFieldSizeSet)
     {
-        ui->flySimulationWidget->setFieldSize(settings.fieldSize);
+        ui->flySimulationWidget->setFieldSize(currentSettings.fieldSize);
         settingsDialog.disableFieldSizeOption();
         isFieldSizeSet = true;
-        emit setFieldSizeRequest(settings.fieldSize);
+        ui->hintLabel->setText(tr("Добавьте на поле мух и нажмите кнопку \"Старт\""));
+        emit setFieldSizeRequest(currentSettings.fieldSize);
     }
-    emit setFlyCapacityRequest(settings.flyCapacity);
+    emit setFlyCapacityRequest(currentSettings.flyCapacity);
 
-    ui->flySimulationWidget->setMaxStupidity(settings.maxStupidity);
-    ui->flySimulationWidget->setManualInputOfStupidity(settings.enterStupidityManually);
-    ui->flySimulationWidget->setAnimationDuration(settings.animationDuration);
+    ui->flySimulationWidget->setMaxStupidity(currentSettings.maxStupidity);
+    ui->flySimulationWidget->setManualInputOfStupidity(currentSettings.enterStupidityManually);
+    ui->flySimulationWidget->setAnimationDuration(currentSettings.animationDuration);
 
     ui->startStopButton->setEnabled(true);
     ui->resetButton->setEnabled(true);
     ui->addFlyButton->setEnabled(true);
+
+    updateOverallInfoLabel();
+}
+
+void MainWindow::restoreOldSettings()
+{
+    settingsDialog.setSettings(currentSettings);
 }
 
 
@@ -101,6 +133,7 @@ void MainWindow::on_startStopButton_clicked()
         simulationRunning = true;
         ui->startStopButton->setText(tr("Стоп"));
         ui->resetButton->setEnabled(false);
+        ui->hintLabel->setText(tr("Идет симуляция поведения мух. Вы можете динамически добавлять мух на поле и изменять все настройки, кроме размера поля. Для остановки симуляции и просмотра статистики нажмите кнопку \"Стоп\""));
         emit startRequest();
     }
     else
@@ -132,6 +165,28 @@ void MainWindow::setAddFlyMode(bool mode)
     {
         isInAddFlyMode = false;
         ui->addFlyButton->setText(tr("Добавить муху"));
-        ui->hintLabel->setText(QString());
+        if(simulationRunning)
+            ui->hintLabel->setText(tr("Идет симуляция поведения мух. Вы можете динамически добавлять мух на поле и изменять все настройки, кроме размера поля. Для остановки симуляции и просмотра статистики нажмите кнопку \"Стоп\""));
+        else
+            ui->hintLabel->setText(tr("Добавьте на поле мух и нажмите кнопку \"Старт\""));
     }
+}
+
+void MainWindow::on_statisticsButton_clicked()
+{
+    QString statistics;
+    const QMap<int, DataModel::FlyInformation> &fliesInfo = model->getFliesInfo();
+    if(fliesInfo.isEmpty())
+        statistics = tr("Нет информации о мухах");
+    for(auto it = fliesInfo.begin(); it != fliesInfo.end(); it++)
+    {
+        statistics.append(tr("Муха №%1\nЖивая: %2\nПродолжительность жизни: %3 мс\nКлеток пройдено: %4\nСредняя скорость: %5 мс/клетку\n\n").
+                           arg(it.key()).
+                           arg(it->isAlive ? tr("Да") : tr("Нет")).
+                           arg(it->lifetime).
+                           arg(it->cellsPassed).
+                           arg(it->cellsPassed == 0 ? QString("N/A") : QString::number(double(it->lifetime) / it->cellsPassed)));
+    }
+    statisticsViewer.setText(statistics);
+    statisticsViewer.show();
 }

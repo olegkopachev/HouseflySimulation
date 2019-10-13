@@ -14,11 +14,11 @@ class SettingsDialog : public QDialog
 public:
     struct Settings
     {
-        int fieldSize;
-        int flyCapacity;
-        int maxStupidity;
-        bool enterStupidityManually;
-        int animationDuration;
+        int fieldSize = 0;
+        int flyCapacity = 0;
+        int maxStupidity = 0;
+        bool enterStupidityManually = false;
+        int animationDuration = 0;
     };
 
 public:
@@ -27,6 +27,7 @@ public:
 
     void disableFieldSizeOption();
 
+    void setSettings(const Settings &settings);
     Settings getSettings() const;
 
 private:

@@ -18,6 +18,18 @@ void SettingsDialog::disableFieldSizeOption()
     ui->fieldSizeSpinBox->setEnabled(false);
 }
 
+void SettingsDialog::setSettings(const SettingsDialog::Settings &settings)
+{
+    if(settings.fieldSize == 0)
+        return;
+
+    ui->fieldSizeSpinBox->setValue(settings.fieldSize);
+    ui->flyCapacitySpinBox->setValue(settings.flyCapacity);
+    ui->maxStupiditySpinBox->setValue(settings.maxStupidity);
+    ui->stupiditySettingMethodComboBox->setCurrentIndex(settings.enterStupidityManually ? 1 : 0);
+    ui->animationDurationSpinBox->setValue(settings.animationDuration);
+}
+
 SettingsDialog::Settings SettingsDialog::getSettings() const
 {
     Settings result;

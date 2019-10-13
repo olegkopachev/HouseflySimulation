@@ -2,7 +2,7 @@
 
 FliesController::FliesController()
 {
-    fliesThreadPool.setMaxThreadCount(50);
+    fliesThreadPool.setMaxThreadCount(100);
 }
 
 FliesController::~FliesController()
@@ -48,6 +48,8 @@ void FliesController::startSimulation()
     while(!waitingFlyTasks.isEmpty())
     {
         runningFlyTasks.push_back(waitingFlyTasks.first());
+        if(fliesThreadPool.activeThreadCount() > fliesThreadPool.maxThreadCount() - 2)
+            fliesThreadPool.setMaxThreadCount(fliesThreadPool.maxThreadCount() + 50);
         fliesThreadPool.start(waitingFlyTasks.first());
         waitingFlyTasks.pop_front();
     }
@@ -90,6 +92,8 @@ void FliesController::addFly(int cellX, int cellY, int stupidity)
         if(isRunning)
         {
             runningFlyTasks.push_back(newFlyTask);
+            if(fliesThreadPool.activeThreadCount() > fliesThreadPool.maxThreadCount() - 2)
+                fliesThreadPool.setMaxThreadCount(fliesThreadPool.maxThreadCount() + 50);
             fliesThreadPool.start(newFlyTask);
         }
         else

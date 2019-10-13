@@ -67,6 +67,6 @@ void FlyIconWidget::mousePressEvent(QMouseEvent *event)
                        arg(isAlive ? tr("Да") : tr("Нет")).
                        arg(lifetime).
                        arg(cellsPassed).
-                       arg(double(lifetime) / cellsPassed));
+                       arg(cellsPassed == 0 ? QString("N/A") : QString::number(double(lifetime) / cellsPassed)));
     QMessageBox::information(nullptr, tr("Статистика по мухе"), statistics);
 }
