@@ -20,11 +20,15 @@ int main(int argc, char *argv[])
     fliesControllerThread.start();
 
     MainWindow w;
+    w.setModel(&model);
 
     QObject::connect(&w, SIGNAL(addNewFlyRequest(int, int, int)), &fliesController, SLOT(addFly(int, int, int)));
     QObject::connect(&w, SIGNAL(startRequest()), &fliesController, SLOT(startSimulation()));
+    QObject::connect(&w, SIGNAL(stopRequest()), &fliesController, SLOT(stopSimulation()));
+    QObject::connect(&fliesController, SIGNAL(simulationStopped()), &w, SLOT(onSimulationStopped()));
     QObject::connect(&model, SIGNAL(flyAdded(int, int, int, int)), &w, SLOT(addNewFly(int, int, int, int)));
     QObject::connect(&model, SIGNAL(flyMoved(int, int, int)), &w, SLOT(moveFly(int, int, int)));
+    QObject::connect(&model, SIGNAL(flyDied(int)), &w, SLOT(killFly(int)));
     w.show();
     return a.exec();
 }

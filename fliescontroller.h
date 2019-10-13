@@ -19,17 +19,19 @@ public:
     void setModel(DataModel *newModel);
 
 signals:
-    void flyMoved(int flyID, int destCellX, int destCellY);
+    void simulationStopped();
 
 public slots:
     void addFly(int cellX, int cellY, int stupidity);
     void startSimulation();
+    void stopSimulation();
 
 protected:
     bool isRunning = false;
     DataModel *model = nullptr;
     QThreadPool fliesThreadPool;
-    QList<SingleFlyTask*> flyTasks;
+    QList<SingleFlyTask*> waitingFlyTasks;
+    QList<SingleFlyTask*> runningFlyTasks;
 };
 
 #endif // FLIESCONTROLLER_H

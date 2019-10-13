@@ -23,7 +23,8 @@ SOURCES += \
     mainwindow.cpp \
     settingsdialog.cpp \
     simulationviewerwidget.cpp \
-    singleflytask.cpp
+    singleflytask.cpp \
+    stupiditysettingdialog.cpp
 
 HEADERS += \
     datamodel.h \
@@ -33,11 +34,13 @@ HEADERS += \
     mainwindow.h \
     settingsdialog.h \
     simulationviewerwidget.h \
-    singleflytask.h
+    singleflytask.h \
+    stupiditysettingdialog.h
 
 FORMS += \
     mainwindow.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    stupiditysettingdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

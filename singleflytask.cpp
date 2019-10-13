@@ -2,16 +2,18 @@
 
 #include <QThread>
 
-SingleFlyTask::SingleFlyTask(int flyID, int startCellX, int startCellY, int fieldSize, int flyStupidity, int lifeSpan, DataModel *dataModel) : QRunnable()
+SingleFlyTask::SingleFlyTask(int flyID, int startCellX, int startCellY, int fieldSize, int flyStupidity, DataModel *dataModel) : QRunnable()
 {
     ID = flyID;
     currentCellX = startCellX;
     currentCellY = startCellY;
     sizeOfField = fieldSize;
     stupidity = flyStupidity;
-    lifetime = lifeSpan;
+    lifetime = flyStupidity * fieldSize;
     model = dataModel;
     randomGenerator = new QRandomGenerator(quint32(QTime::currentTime().msecsSinceStartOfDay()));
+
+    setAutoDelete(false);
 }
 
 SingleFlyTask::~SingleFlyTask()
@@ -44,6 +46,10 @@ void SingleFlyTask::run()
             cellsPassed++;
         }
     }
+    int elapsedTime = timeConter.elapsed();
+    if(elapsedTime >= lifetime)
+        model->killFly(ID);
+    model->setFlyLifeAndRouteInfo(ID, elapsedTime, cellsPassed);
 }
 
 void SingleFlyTask::stopRequest()

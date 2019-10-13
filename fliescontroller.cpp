@@ -18,11 +18,36 @@ void FliesController::setModel(DataModel *newModel)
 void FliesController::startSimulation()
 {
     isRunning = true;
-    while(!flyTasks.isEmpty())
+    while(!waitingFlyTasks.isEmpty())
     {
-        fliesThreadPool.start(flyTasks.first());
-        flyTasks.pop_front();
+        runningFlyTasks.push_back(waitingFlyTasks.first());
+        fliesThreadPool.start(waitingFlyTasks.first());
+        waitingFlyTasks.pop_front();
     }
+}
+
+void FliesController::stopSimulation()
+{
+    foreach (SingleFlyTask* task, runningFlyTasks)
+    {
+        task->stopRequest();
+    }
+    foreach (SingleFlyTask* task, waitingFlyTasks)
+    {
+        delete task;
+    }
+    waitingFlyTasks.clear();
+
+    fliesThreadPool.waitForDone();
+
+    foreach (SingleFlyTask* task, runningFlyTasks)
+    {
+        delete task;
+    }
+    runningFlyTasks.clear();
+    isRunning = false;
+
+    emit simulationStopped();
 }
 
 void FliesController::addFly(int cellX, int cellY, int stupidity)
@@ -32,7 +57,13 @@ void FliesController::addFly(int cellX, int cellY, int stupidity)
 
     static int counter = 0;
     model->addNewFly(counter, cellX, cellY, stupidity);
-    SingleFlyTask* newFlyTask = new SingleFlyTask(counter, cellX, cellY, 6, stupidity, 60000, model);
+    SingleFlyTask* newFlyTask = new SingleFlyTask(counter, cellX, cellY, 6, stupidity, model);
     counter++;
-    flyTasks.push_back(newFlyTask);
+    if(isRunning)
+    {
+        runningFlyTasks.push_back(newFlyTask);
+        fliesThreadPool.start(newFlyTask);
+    }
+    else
+        waitingFlyTasks.push_back(newFlyTask);
 }

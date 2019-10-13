@@ -1,5 +1,6 @@
 #include "simulationviewerwidget.h"
 #include "flyiconwidget.h"
+#include "stupiditysettingdialog.h"
 #include "defines.h"
 
 #include <QPainter>
@@ -43,11 +44,11 @@ void SimulationViewerWidget::addNewFly(int flyID, int x, int y, int stupidity, i
     FlyEnvelope newFly;
     newFly.cellX = x;
     newFly.cellY = y;
-    newFly.flyWidget = new FlyIconWidget(stupidity, maxStupidity, this);
+    newFly.flyWidget = new FlyIconWidget(flyID, stupidity, maxStupidity, this);
     newFly.animation = new QPropertyAnimation();
     newFly.animation->setTargetObject(newFly.flyWidget);
     newFly.animation->setPropertyName("geometry");
-    newFly.animation->setDuration(1500);
+    newFly.animation->setDuration(500);
     flies[flyID] = newFly;
     QPair<int, int> flyCoordinates = coordsForNewFlyInCell(x, y);
     fliesByCells[QPair<int, int>(x, y)].push_back(flyID);
@@ -114,7 +115,21 @@ void SimulationViewerWidget::mousePressEvent(QMouseEvent *event)
         return;
 
     QPair<int, int> cell = coordsToCell(event->x(), event->y());
-    emit addNewFlyRequest(cell.first, cell.second, 10000);
+    int stupidity;
+    if(enterStupidityManually)
+    {
+        StupiditySettingDialog dialog(this);
+        dialog.setStupidityRange(10, 10000);
+        int result = dialog.exec();
+        if(result == QDialog::Accepted)
+            stupidity = dialog.getStupidity();
+        else
+            return;
+    }
+    else
+        stupidity = randomGenerator.bounded(10000);
+
+    emit addNewFlyRequest(cell.first, cell.second, stupidity);
     activateAddFlyMode(false);
 }
 
@@ -146,4 +161,17 @@ void SimulationViewerWidget::moveFly(int flyID, int destCellX, int destCellY)
     flies[flyID].animation->setStartValue(QRect(flies[flyID].flyWidget->x(), flies[flyID].flyWidget->y(), FLY_ICON_WIDTH, FLY_ICON_HEIGHT));
     flies[flyID].animation->setEndValue(QRect(newCoordinates.first, newCoordinates.second, FLY_ICON_WIDTH, FLY_ICON_HEIGHT));
     flies[flyID].animation->start();
+}
+
+void SimulationViewerWidget::killFly(int flyID)
+{
+    flies[flyID].flyWidget->drawDeadFly();
+}
+
+void SimulationViewerWidget::setFliesInfo(const QMap<int, DataModel::FlyInformation> &fliesInfo)
+{
+    for(auto it = fliesInfo.begin(); it != fliesInfo.end(); it++)
+    {
+        flies[it.key()].flyWidget->setFlyInfo(it.value());
+    }
 }

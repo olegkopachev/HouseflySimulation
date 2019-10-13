@@ -10,7 +10,7 @@
 class SingleFlyTask : public QRunnable
 {
 public:
-    SingleFlyTask(int flyID, int startCellX, int startCellY, int fieldSize, int flyStupidity, int lifeSpan, DataModel *dataModel);
+    SingleFlyTask(int flyID, int startCellX, int startCellY, int fieldSize, int flyStupidity, DataModel *dataModel);
     ~SingleFlyTask();
 
     virtual void run() override;

@@ -2,12 +2,14 @@
 #define SIMULATIONVIEWERWIDGET_H
 
 #include "flyiconwidget.h"
+#include "datamodel.h"
 
 #include <QFrame>
 #include <QPair>
 #include <QList>
 #include <QMap>
 #include <QPropertyAnimation>
+#include <QRandomGenerator>
 
 
 class SimulationViewerWidget : public QFrame
@@ -29,6 +31,9 @@ public:
     void setFieldSize(int value);
     void addNewFly(int flyID, int x, int y, int stupidity, int maxStupidity);
     void activateAddFlyMode(bool activate);
+    void moveFly(int flyID, int destCellX, int destCellY);
+    void killFly(int flyID);
+    void setFliesInfo(const QMap<int, DataModel::FlyInformation> &fliesInfo);
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
@@ -41,9 +46,6 @@ protected:
 signals:
     void addNewFlyRequest(int cellX, int cellY, int stupidity);
 
-public slots:
-    void moveFly(int flyID, int destCellX, int destCellY);
-
 private:
     int fieldSize = 0;
     int cellWidth = 0;
@@ -51,6 +53,8 @@ private:
     int cellFlyCapacityX = 0;
     int cellFlyCapacityY = 0;
     bool isInAddFlyMode = false;
+    bool enterStupidityManually = true;
+    QRandomGenerator randomGenerator;
     QMap<int, FlyEnvelope> flies;
     QMap<QPair<int, int>, QList<int>> fliesByCells;
 };
