@@ -13,6 +13,15 @@ DataModel::~DataModel()
     }
 }
 
+void DataModel::reset()
+{
+    fliesInfo.clear();
+    for(auto it = cellsInfo.begin(); it != cellsInfo.end(); it++)
+        cellsInfo[it.key()].clear();
+
+    emit modelReset();
+}
+
 void DataModel::setFieldSize(int value)
 {
     fieldSize = value;
@@ -28,13 +37,23 @@ void DataModel::setFieldSize(int value)
 
 void DataModel::setFlyCapacity(int value)
 {
+    if(value == flyCapacity)
+        return;
+
+    int cellsCount = fieldSize * fieldSize;
+    for(int i = 0; i < cellsCount; i++)
+        mutexes[i]->lock();
+
     flyCapacity = value;
+
+    for(int i = 0; i < cellsCount; i++)
+        mutexes[i]->unlock();
 }
 
-void DataModel::addNewFly(int flyID, int cellX, int cellY, int stupidity)
+bool DataModel::addNewFly(int flyID, int cellX, int cellY, int stupidity)
 {
     int cellIndex = index(cellX, cellY);
-    bool success = false;
+    bool result = false;
 
     mutexes[cellIndex]->lock();
 
@@ -42,13 +61,15 @@ void DataModel::addNewFly(int flyID, int cellX, int cellY, int stupidity)
     {
         fliesInfo[flyID] = FlyInformation(cellIndex);
         cellsInfo[cellIndex].push_back(flyID);
-        success = true;
+        result = true;
     }
 
     mutexes[cellIndex]->unlock();
 
-    if(success == true)
+    if(result == true)
         emit flyAdded(flyID, cellX, cellY, stupidity);
+
+    return result;
 }
 
 bool DataModel::tryToMove(int flyID, int destCellX, int destCellY)

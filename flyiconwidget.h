@@ -10,7 +10,7 @@ class FlyIconWidget : public QLabel
     Q_OBJECT
 
 public:
-    explicit FlyIconWidget(int flyID, int stupidity, int maxStupidity, QWidget *parent = nullptr);
+    explicit FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent = nullptr);
     ~FlyIconWidget();
 
     void drawDeadFly();
@@ -21,6 +21,7 @@ protected:
 
 protected:
     int ID = 0;
+    double stupidityRate = 0.0;
     bool hasInfo = false;
     bool isAlive = true;
     int lifetime = 0;

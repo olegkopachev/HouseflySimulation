@@ -29,11 +29,16 @@ public:
     ~SimulationViewerWidget();
 
     void setFieldSize(int value);
-    void addNewFly(int flyID, int x, int y, int stupidity, int maxStupidity);
+    void addNewFly(int flyID, int x, int y, int stupidity);
     void activateAddFlyMode(bool activate);
     void moveFly(int flyID, int destCellX, int destCellY);
     void killFly(int flyID);
     void setFliesInfo(const QMap<int, DataModel::FlyInformation> &fliesInfo);
+    void reset();
+
+    void setAnimationDuration(int duration);
+    void setManualInputOfStupidity(bool value);
+    void setMaxStupidity(int stupidity);
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
@@ -45,6 +50,7 @@ protected:
 
 signals:
     void addNewFlyRequest(int cellX, int cellY, int stupidity);
+    void flyModeChanged(bool value);
 
 private:
     int fieldSize = 0;
@@ -53,6 +59,8 @@ private:
     int cellFlyCapacityX = 0;
     int cellFlyCapacityY = 0;
     bool isInAddFlyMode = false;
+    int animationDuration = 0;
+    int maxStupidity = 10000;
     bool enterStupidityManually = true;
     QRandomGenerator randomGenerator;
     QMap<int, FlyEnvelope> flies;

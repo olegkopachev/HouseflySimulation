@@ -4,16 +4,28 @@
 #include <QImage>
 #include <QMessageBox>
 
-FlyIconWidget::FlyIconWidget(int flyID, int stupidity, int maxStupidity, QWidget *parent) :
+FlyIconWidget::FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent) :
     QLabel(parent)
 {
     ID = flyID;
+    stupidityRate = stupidityPercent;
 
     setFixedSize(FLY_ICON_WIDTH, FLY_ICON_HEIGHT);
-    setPixmap(QPixmap(":/images/fly.png"));
     setAttribute(Qt::WA_TranslucentBackground);
 
-    QImage image = pixmap()->toImage();
+    QPixmap pixmap(":/images/fly.png");
+    QImage image = pixmap.toImage();
+    for(int i = 0; i < image.width(); i++)
+    {
+        for (int j = 0; j < image.height(); j++)
+        {
+            QColor color = image.pixelColor(i, j);
+            int newBlue = color.blue() + int((255 - color.blue()) * stupidityPercent);
+            color.setBlue(newBlue);
+            image.setPixelColor(i, j, color);
+        }
+    }
+    setPixmap(QPixmap::fromImage(image));
 }
 
 FlyIconWidget::~FlyIconWidget()
@@ -22,7 +34,19 @@ FlyIconWidget::~FlyIconWidget()
 
 void FlyIconWidget::drawDeadFly()
 {
-    setPixmap(QPixmap(":/images/deadfly.png"));
+    QPixmap pixmap(":/images/deadfly.png");
+    QImage image = pixmap.toImage();
+    for(int i = 0; i < image.width(); i++)
+    {
+        for (int j = 0; j < image.height(); j++)
+        {
+            QColor color = image.pixelColor(i, j);
+            int newBlue = color.blue() + int((255 - color.blue()) * stupidityRate);
+            color.setBlue(newBlue);
+            image.setPixelColor(i, j, color);
+        }
+    }
+    setPixmap(QPixmap::fromImage(image));
 }
 
 void FlyIconWidget::setFlyInfo(const DataModel::FlyInformation &flyInfo)
@@ -44,5 +68,5 @@ void FlyIconWidget::mousePressEvent(QMouseEvent *event)
                        arg(lifetime).
                        arg(cellsPassed).
                        arg(double(lifetime) / cellsPassed));
-    QMessageBox::information(this, tr("Статистика по мухе"), statistics);
+    QMessageBox::information(nullptr, tr("Статистика по мухе"), statistics);
 }

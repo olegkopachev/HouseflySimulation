@@ -25,10 +25,12 @@ public:
     DataModel();
     ~DataModel();
 
+    void reset();
+
     void setFieldSize(int value);
     void setFlyCapacity(int value);
 
-    void addNewFly(int flyID, int cellX, int cellY, int stupidity);
+    bool addNewFly(int flyID, int cellX, int cellY, int stupidity);
     bool tryToMove(int flyID, int destCellX, int destCellY);
     void killFly(int flyID);
     void setFlyLifeAndRouteInfo(int flyID, int lifetime, int cellsPassed);
@@ -42,6 +44,7 @@ signals:
     void flyAdded(int flyID, int cellX, int cellY, int stupidity);
     void flyMoved(int flyID, int destCellX, int destCellY);
     void flyDied(int flyID);
+    void modelReset();
 
 protected:
     int fieldSize = 0;

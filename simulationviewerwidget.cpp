@@ -39,12 +39,12 @@ void SimulationViewerWidget::setFieldSize(int value)
     repaint();
 }
 
-void SimulationViewerWidget::addNewFly(int flyID, int x, int y, int stupidity, int maxStupidity)
+void SimulationViewerWidget::addNewFly(int flyID, int x, int y, int stupidity)
 {
     FlyEnvelope newFly;
     newFly.cellX = x;
     newFly.cellY = y;
-    newFly.flyWidget = new FlyIconWidget(flyID, stupidity, maxStupidity, this);
+    newFly.flyWidget = new FlyIconWidget(flyID, double(stupidity) / maxStupidity, this);
     newFly.animation = new QPropertyAnimation();
     newFly.animation->setTargetObject(newFly.flyWidget);
     newFly.animation->setPropertyName("geometry");
@@ -63,6 +63,8 @@ void SimulationViewerWidget::activateAddFlyMode(bool activate)
         setCursor(QCursor(QPixmap(":/images/target.png")));
     else
         setCursor(QCursor());
+
+    emit flyModeChanged(activate);
 }
 
 void SimulationViewerWidget::paintEvent(QPaintEvent *event)
@@ -118,8 +120,8 @@ void SimulationViewerWidget::mousePressEvent(QMouseEvent *event)
     int stupidity;
     if(enterStupidityManually)
     {
-        StupiditySettingDialog dialog(this);
-        dialog.setStupidityRange(10, 10000);
+        StupiditySettingDialog dialog;
+        dialog.setStupidityRange(5, maxStupidity);
         int result = dialog.exec();
         if(result == QDialog::Accepted)
             stupidity = dialog.getStupidity();
@@ -127,7 +129,7 @@ void SimulationViewerWidget::mousePressEvent(QMouseEvent *event)
             return;
     }
     else
-        stupidity = randomGenerator.bounded(10000);
+        stupidity = 5 + randomGenerator.bounded(maxStupidity - 5);
 
     emit addNewFlyRequest(cell.first, cell.second, stupidity);
     activateAddFlyMode(false);
@@ -174,4 +176,37 @@ void SimulationViewerWidget::setFliesInfo(const QMap<int, DataModel::FlyInformat
     {
         flies[it.key()].flyWidget->setFlyInfo(it.value());
     }
+}
+
+void SimulationViewerWidget::reset()
+{
+    activateAddFlyMode(false);
+    for(auto it = flies.begin(); it != flies.end(); it++)
+    {
+        (*it).animation->stop();
+        delete (*it).animation;
+        delete (*it).flyWidget;
+    }
+    flies.clear();
+    for(auto it = fliesByCells.begin(); it != fliesByCells.end(); it++)
+        (*it).clear();
+
+    repaint();
+}
+
+void SimulationViewerWidget::setAnimationDuration(int duration)
+{
+    animationDuration = duration;
+    for(auto it = flies.begin(); it != flies.end(); it++)
+        (*it).animation->setDuration(duration);
+}
+
+void SimulationViewerWidget::setManualInputOfStupidity(bool value)
+{
+    enterStupidityManually = value;
+}
+
+void SimulationViewerWidget::setMaxStupidity(int stupidity)
+{
+    maxStupidity = stupidity;
 }

@@ -15,6 +15,33 @@ void FliesController::setModel(DataModel *newModel)
     model = newModel;
 }
 
+void FliesController::reset()
+{
+    stopSimulation();
+    currentFlyCount = 0;
+    model->reset();
+}
+
+void FliesController::quit()
+{
+    stopSimulation();
+    emit quitRequest();
+}
+
+void FliesController::setFieldSize(int size)
+{
+    if(isRunning)
+        return;
+
+    fieldSize = size;
+    model->setFieldSize(size);
+}
+
+void FliesController::setFlyCapacity(int capacity)
+{
+    model->setFlyCapacity(capacity);
+}
+
 void FliesController::startSimulation()
 {
     isRunning = true;
@@ -55,15 +82,17 @@ void FliesController::addFly(int cellX, int cellY, int stupidity)
     if(model == nullptr)
         return;
 
-    static int counter = 0;
-    model->addNewFly(counter, cellX, cellY, stupidity);
-    SingleFlyTask* newFlyTask = new SingleFlyTask(counter, cellX, cellY, 6, stupidity, model);
-    counter++;
-    if(isRunning)
+    int newFlyID = currentFlyCount;
+    if(model->addNewFly(newFlyID, cellX, cellY, stupidity))
     {
-        runningFlyTasks.push_back(newFlyTask);
-        fliesThreadPool.start(newFlyTask);
+        currentFlyCount++;
+        SingleFlyTask* newFlyTask = new SingleFlyTask(newFlyID, cellX, cellY, fieldSize, stupidity, model);
+        if(isRunning)
+        {
+            runningFlyTasks.push_back(newFlyTask);
+            fliesThreadPool.start(newFlyTask);
+        }
+        else
+            waitingFlyTasks.push_back(newFlyTask);
     }
-    else
-        waitingFlyTasks.push_back(newFlyTask);
 }

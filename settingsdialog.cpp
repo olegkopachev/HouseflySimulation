@@ -13,7 +13,19 @@ SettingsDialog::~SettingsDialog()
     delete ui;
 }
 
-int SettingsDialog::fieldSize() const
+void SettingsDialog::disableFieldSizeOption()
 {
-    return ui->fieldSizeSpinBox->value();
+    ui->fieldSizeSpinBox->setEnabled(false);
+}
+
+SettingsDialog::Settings SettingsDialog::getSettings() const
+{
+    Settings result;
+    result.fieldSize = ui->fieldSizeSpinBox->value();
+    result.flyCapacity = ui->flyCapacitySpinBox->value();
+    result.maxStupidity = ui->maxStupiditySpinBox->value();
+    result.enterStupidityManually = ui->stupiditySettingMethodComboBox->currentIndex() == 1 ? true : false;
+    result.animationDuration = ui->animationDurationSpinBox->value();
+
+    return result;
 }

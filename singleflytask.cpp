@@ -29,9 +29,14 @@ void SingleFlyTask::run()
     while(!stopFlag && timeConter.elapsed() < lifetime)
     {
         int waitTime = randomGenerator->bounded(stupidity);
-        QThread::msleep(unsigned(waitTime));
-
-        if(stopFlag)
+        while(waitTime > 0)
+        {
+            QThread::msleep(unsigned(qMin(waitTime, 200)));
+            if(stopFlag || timeConter.elapsed() >= lifetime)
+                break;
+            waitTime -= 200;
+        }
+        if(stopFlag || timeConter.elapsed() >= lifetime)
             break;
 
         int destCellCode = randomGenerator->bounded(adjacentCellsCount());
