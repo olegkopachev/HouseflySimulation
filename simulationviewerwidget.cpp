@@ -38,7 +38,7 @@ void SimulationViewerWidget::setFieldSize(int value)
     repaint();
 }
 
-void SimulationViewerWidget::addNewFly(int flyID, int x, int y, unsigned int stupidity, unsigned int maxStupidity)
+void SimulationViewerWidget::addNewFly(int flyID, int x, int y, int stupidity, int maxStupidity)
 {
     FlyEnvelope newFly;
     newFly.cellX = x;
@@ -114,7 +114,7 @@ void SimulationViewerWidget::mousePressEvent(QMouseEvent *event)
         return;
 
     QPair<int, int> cell = coordsToCell(event->x(), event->y());
-    emit addNewFlyRequest(cell.first, cell.second);
+    emit addNewFlyRequest(cell.first, cell.second, 10000);
     activateAddFlyMode(false);
 }
 

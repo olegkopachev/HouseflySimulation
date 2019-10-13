@@ -21,8 +21,10 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    QObject::connect(&w, SIGNAL(addNewFlyRequest(int, int)), &fliesController, SLOT(addFly(int, int)));
-    QObject::connect(&model, SIGNAL(flyAdded(int, int, int)), &w, SLOT(addNewFly(int, int, int)));
+    QObject::connect(&w, SIGNAL(addNewFlyRequest(int, int, int)), &fliesController, SLOT(addFly(int, int, int)));
+    QObject::connect(&w, SIGNAL(startRequest()), &fliesController, SLOT(startSimulation()));
+    QObject::connect(&model, SIGNAL(flyAdded(int, int, int, int)), &w, SLOT(addNewFly(int, int, int, int)));
+    QObject::connect(&model, SIGNAL(flyMoved(int, int, int)), &w, SLOT(moveFly(int, int, int)));
     w.show();
     return a.exec();
 }

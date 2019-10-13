@@ -31,26 +31,24 @@ void DataModel::setFlyCapacity(int value)
     flyCapacity = value;
 }
 
-void DataModel::addNewFly(int cellX, int cellY)
+void DataModel::addNewFly(int flyID, int cellX, int cellY, int stupidity)
 {
     int cellIndex = index(cellX, cellY);
     bool success = false;
-    int newFlyID = -1;
 
     mutexes[cellIndex]->lock();
 
     if(fliesByCells[cellIndex].size() < flyCapacity)
     {
-        int newFlyID = cellsByFlies.size();
-        cellsByFlies[newFlyID] = cellIndex;
-        fliesByCells[cellIndex].push_back(newFlyID);
+        cellsByFlies[flyID] = cellIndex;
+        fliesByCells[cellIndex].push_back(flyID);
         success = true;
     }
 
     mutexes[cellIndex]->unlock();
 
     if(success == true)
-        emit flyAdded(newFlyID, cellX, cellY);
+        emit flyAdded(flyID, cellX, cellY, stupidity);
 }
 
 bool DataModel::tryToMove(int flyID, int destCellX, int destCellY)

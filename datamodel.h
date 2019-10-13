@@ -17,14 +17,14 @@ public:
     void setFieldSize(int value);
     void setFlyCapacity(int value);
 
-    void addNewFly(int cellX, int cellY);
+    void addNewFly(int flyID, int cellX, int cellY, int stupidity);
     bool tryToMove(int flyID, int destCellX, int destCellY);
 
 protected:
     inline int index(int x, int y);
 
 signals:
-    void flyAdded(int flyID, int cellX, int cellY);
+    void flyAdded(int flyID, int cellX, int cellY, int stupidity);
     void flyMoved(int flyID, int destCellX, int destCellY);
 
 protected:

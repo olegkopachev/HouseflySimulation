@@ -12,8 +12,6 @@ SingleFlyTask::SingleFlyTask(int flyID, int startCellX, int startCellY, int fiel
     lifetime = lifeSpan;
     model = dataModel;
     randomGenerator = new QRandomGenerator(quint32(QTime::currentTime().msecsSinceStartOfDay()));
-
-    setAutoDelete(false);
 }
 
 SingleFlyTask::~SingleFlyTask()

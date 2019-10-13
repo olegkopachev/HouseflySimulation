@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->resetButton->setEnabled(false);
     ui->addFlyButton->setEnabled(false);
 
-    connect(ui->flySimulationWidget, SIGNAL(addNewFlyRequest(int, int)), this, SIGNAL(addNewFlyRequest(int, int)));
+    connect(ui->flySimulationWidget, SIGNAL(addNewFlyRequest(int, int, int)), this, SIGNAL(addNewFlyRequest(int, int, int)));
     connect(&settingsDialog, SIGNAL(accepted()), this, SLOT(setNewSettings()));
 }
 
@@ -23,9 +23,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addNewFly(int flyID, int cellX, int cellY)
+void MainWindow::addNewFly(int flyID, int cellX, int cellY, int stupidity)
 {
-    ui->flySimulationWidget->addNewFly(flyID, cellX, cellY, 100, 100);
+    ui->flySimulationWidget->addNewFly(flyID, cellX, cellY, stupidity, 100);
+}
+
+void MainWindow::moveFly(int flyID, int destCellX, int destCellY)
+{
+    ui->flySimulationWidget->moveFly(flyID, destCellX, destCellY);
 }
 
 void MainWindow::setNewSettings()
@@ -51,4 +56,5 @@ void MainWindow::on_addFlyButton_clicked()
 
 void MainWindow::on_startStopButton_clicked()
 {
+    emit startRequest();
 }

@@ -3,7 +3,7 @@
 
 #include <QImage>
 
-FlyIconWidget::FlyIconWidget(unsigned int stupidity, unsigned int maxStupidity, QWidget *parent) :
+FlyIconWidget::FlyIconWidget(int stupidity, int maxStupidity, QWidget *parent) :
     QLabel(parent)
 {
     setFixedSize(FLY_ICON_WIDTH, FLY_ICON_HEIGHT);

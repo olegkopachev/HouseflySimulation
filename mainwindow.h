@@ -18,10 +18,12 @@ public:
     ~MainWindow();
 
 signals:
-    void addNewFlyRequest(int cellX, int cellY);
+    void addNewFlyRequest(int cellX, int cellY, int stupidity);
+    void startRequest();
 
 public slots:
-    void addNewFly(int flyID, int cellX, int cellY);
+    void addNewFly(int flyID, int cellX, int cellY, int stupidity);
+    void moveFly(int flyID, int destCellX, int destCellY);
 
 private slots:
 

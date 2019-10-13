@@ -27,7 +27,7 @@ public:
     ~SimulationViewerWidget();
 
     void setFieldSize(int value);
-    void addNewFly(int flyID, int x, int y, unsigned int stupidity, unsigned int maxStupidity);
+    void addNewFly(int flyID, int x, int y, int stupidity, int maxStupidity);
     void activateAddFlyMode(bool activate);
 
 protected:
@@ -39,7 +39,7 @@ protected:
     QPair<int, int> coordsForNewFlyInCell(int cellX, int cellY);
 
 signals:
-    void addNewFlyRequest(int cellX, int cellY);
+    void addNewFlyRequest(int cellX, int cellY, int stupidity);
 
 public slots:
     void moveFly(int flyID, int destCellX, int destCellY);

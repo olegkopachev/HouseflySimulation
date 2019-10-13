@@ -8,7 +8,7 @@ class FlyIconWidget : public QLabel
     Q_OBJECT
 
 public:
-    explicit FlyIconWidget(unsigned int stupidity, unsigned int maxStupidity, QWidget *parent = nullptr);
+    explicit FlyIconWidget(int stupidity, int maxStupidity, QWidget *parent = nullptr);
     ~FlyIconWidget();
 
     void drawDeadFly();
