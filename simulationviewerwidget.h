@@ -4,7 +4,6 @@
 #include "flyiconwidget.h"
 
 #include <QFrame>
-#include <QVector>
 #include <QPair>
 #include <QList>
 #include <QMap>
@@ -40,7 +39,7 @@ protected:
     QPair<int, int> coordsForNewFlyInCell(int cellX, int cellY);
 
 signals:
-    void newFlyAdded(int flyID);
+    void addNewFlyRequest(int cellX, int cellY);
 
 public slots:
     void moveFly(int flyID, int destCellX, int destCellY);
@@ -52,7 +51,7 @@ private:
     int cellFlyCapacityX = 0;
     int cellFlyCapacityY = 0;
     bool isInAddFlyMode = false;
-    QVector<FlyEnvelope> flies;
+    QMap<int, FlyEnvelope> flies;
     QMap<QPair<int, int>, QList<int>> fliesByCells;
 };
 

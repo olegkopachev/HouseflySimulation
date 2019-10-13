@@ -18,7 +18,10 @@ public:
     ~MainWindow();
 
 signals:
-    void newFlyAdded(int flyID);
+    void addNewFlyRequest(int cellX, int cellY);
+
+public slots:
+    void addNewFly(int flyID, int cellX, int cellY);
 
 private slots:
 

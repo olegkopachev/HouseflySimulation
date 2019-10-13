@@ -48,7 +48,7 @@ void SimulationViewerWidget::addNewFly(int flyID, int x, int y, unsigned int stu
     newFly.animation->setTargetObject(newFly.flyWidget);
     newFly.animation->setPropertyName("geometry");
     newFly.animation->setDuration(1500);
-    flies.push_back(newFly);
+    flies[flyID] = newFly;
     QPair<int, int> flyCoordinates = coordsForNewFlyInCell(x, y);
     fliesByCells[QPair<int, int>(x, y)].push_back(flyID);
     flies.last().flyWidget->move(flyCoordinates.first, flyCoordinates.second);
@@ -114,7 +114,7 @@ void SimulationViewerWidget::mousePressEvent(QMouseEvent *event)
         return;
 
     QPair<int, int> cell = coordsToCell(event->x(), event->y());
-    addNewFly(flies.size(), cell.first, cell.second, 100, 100);
+    emit addNewFlyRequest(cell.first, cell.second);
     activateAddFlyMode(false);
 }
 
