@@ -28,6 +28,9 @@ public:
     explicit SimulationViewerWidget(QWidget *parent = nullptr);
     ~SimulationViewerWidget();
 
+    void setBackgroundColor(int index);
+    void setFlyIcon(int index);
+
     void setFieldSize(int value);
     void addNewFly(int flyID, int x, int y, int stupidity);
     void activateAddFlyMode(bool activate);
@@ -63,6 +66,7 @@ private:
     int maxStupidity = 10000;
     bool enterStupidityManually = true;
     QRandomGenerator randomGenerator;
+    QString currentIconName;
     QMap<int, FlyEnvelope> flies;
     QMap<QPair<int, int>, QList<int>> fliesByCells;
 };

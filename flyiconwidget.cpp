@@ -4,7 +4,7 @@
 #include <QImage>
 #include <QMessageBox>
 
-FlyIconWidget::FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent) :
+FlyIconWidget::FlyIconWidget(int flyID, double stupidityPercent, QString iconName, QWidget *parent) :
     QLabel(parent)
 {
     ID = flyID;
@@ -13,14 +13,26 @@ FlyIconWidget::FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent
     setFixedSize(FLY_ICON_WIDTH, FLY_ICON_HEIGHT);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    QPixmap pixmap(":/images/fly.png");
+    setIcon(iconName);
+}
+
+FlyIconWidget::~FlyIconWidget()
+{
+}
+
+void FlyIconWidget::setIcon(QString iconName)
+{
+    if(!isAlive)
+        return;
+
+    QPixmap pixmap(iconName);
     QImage image = pixmap.toImage();
     for(int i = 0; i < image.width(); i++)
     {
         for (int j = 0; j < image.height(); j++)
         {
             QColor color = image.pixelColor(i, j);
-            int newBlue = color.blue() + int((255 - color.blue()) * stupidityPercent);
+            int newBlue = color.blue() + int((255 - color.blue()) * stupidityRate);
             color.setBlue(newBlue);
             image.setPixelColor(i, j, color);
         }
@@ -28,12 +40,9 @@ FlyIconWidget::FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent
     setPixmap(QPixmap::fromImage(image));
 }
 
-FlyIconWidget::~FlyIconWidget()
-{
-}
-
 void FlyIconWidget::drawDeadFly()
 {
+    isAlive = false;
     QPixmap pixmap(":/images/deadfly.png");
     QImage image = pixmap.toImage();
     for(int i = 0; i < image.width(); i++)

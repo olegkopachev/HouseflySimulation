@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Настройки</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="1">

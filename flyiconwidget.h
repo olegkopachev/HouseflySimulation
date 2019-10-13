@@ -10,9 +10,10 @@ class FlyIconWidget : public QLabel
     Q_OBJECT
 
 public:
-    explicit FlyIconWidget(int flyID, double stupidityPercent, QWidget *parent = nullptr);
+    explicit FlyIconWidget(int flyID, double stupidityPercent, QString iconName, QWidget *parent = nullptr);
     ~FlyIconWidget();
 
+    void setIcon(QString iconName);
     void drawDeadFly();
     void setFlyInfo(const DataModel::FlyInformation &flyInfo);
 

@@ -10,12 +10,33 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setWindowIcon(QIcon(":/images/fly6.png"));
+
     ui->overallInfoLabel->setText(tr("Настройки игры не установлены"));
     ui->hintLabel->setText(tr("Для начала симуляции нажмите кнопку \"Настройки\" и задайте параметры"));
     ui->startStopButton->setEnabled(false);
     ui->resetButton->setEnabled(false);
     ui->addFlyButton->setEnabled(false);
     ui->statisticsButton->setEnabled(false);
+
+    ui->settingsButton->setStyleSheet("QPushButton {background-color: rgb(230, 230, 230);}"
+                                       "QPushButton:disabled {background-color: rgb(180, 180, 180);}");
+    ui->startStopButton->setStyleSheet("QPushButton {background-color: rgb(255, 150, 150);}"
+                                       "QPushButton:disabled {background-color: rgb(180, 180, 180);}");
+    ui->resetButton->setStyleSheet("QPushButton {background-color: rgb(255, 80, 80);}"
+                                       "QPushButton:disabled {background-color: rgb(180, 180, 180);}");
+    ui->addFlyButton->setStyleSheet("QPushButton {background-color: rgb(200, 255, 200);}"
+                                    "QPushButton:disabled {background-color: rgb(180, 180, 180);}");
+    ui->statisticsButton->setStyleSheet("QPushButton {background-color: rgb(230, 230, 230);}"
+                                       "QPushButton:disabled {background-color: rgb(180, 180, 180);}");
+
+    ui->backgroundComboBox->setIconSize(QSize(50, 30));
+    for(int i = 1; i <= 6; i++)
+        ui->backgroundComboBox->setItemIcon(i, QIcon(QString(":/images/background%1.jpg").arg(i)));
+
+    ui->flyIconComboBox->setIconSize(QSize(50, 30));
+    for(int i = 0; i < 8; i++)
+        ui->flyIconComboBox->setItemIcon(i, QIcon(QString(":/images/fly%1.png").arg(i + 1)));
 
     statisticsViewer.setWindowTitle("Статистика по мухам");
 
@@ -93,16 +114,16 @@ void MainWindow::setNewSettings()
         isFieldSizeSet = true;
         ui->hintLabel->setText(tr("Добавьте на поле мух и нажмите кнопку \"Старт\""));
         emit setFieldSizeRequest(currentSettings.fieldSize);
+
+        ui->startStopButton->setEnabled(true);
+        ui->resetButton->setEnabled(true);
+        ui->addFlyButton->setEnabled(true);
     }
     emit setFlyCapacityRequest(currentSettings.flyCapacity);
 
     ui->flySimulationWidget->setMaxStupidity(currentSettings.maxStupidity);
     ui->flySimulationWidget->setManualInputOfStupidity(currentSettings.enterStupidityManually);
     ui->flySimulationWidget->setAnimationDuration(currentSettings.animationDuration);
-
-    ui->startStopButton->setEnabled(true);
-    ui->resetButton->setEnabled(true);
-    ui->addFlyButton->setEnabled(true);
 
     updateOverallInfoLabel();
 }
@@ -188,5 +209,16 @@ void MainWindow::on_statisticsButton_clicked()
                            arg(it->cellsPassed == 0 ? QString("N/A") : QString::number(double(it->lifetime) / it->cellsPassed)));
     }
     statisticsViewer.setText(statistics);
+    statisticsViewer.resize(300, 500);
     statisticsViewer.show();
+}
+
+void MainWindow::on_backgroundComboBox_currentIndexChanged(int index)
+{
+    ui->flySimulationWidget->setBackgroundColor(index);
+}
+
+void MainWindow::on_flyIconComboBox_currentIndexChanged(int index)
+{
+    ui->flySimulationWidget->setFlyIcon(index);
 }

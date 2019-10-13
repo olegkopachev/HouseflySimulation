@@ -10,7 +10,8 @@
 SimulationViewerWidget::SimulationViewerWidget(QWidget *parent) :
     QFrame(parent)
 {
-    setStyleSheet("QFrame { background-color: rgb(0,0,255); }");
+    setStyleSheet("QFrame { background-image: url(:/images/background2.jpg); }");
+    currentIconName = QString(":/images/fly1.png");
 }
 
 SimulationViewerWidget::~SimulationViewerWidget()
@@ -19,6 +20,23 @@ SimulationViewerWidget::~SimulationViewerWidget()
     {
         delete (*it).animation;
         delete (*it).flyWidget;
+    }
+}
+
+void SimulationViewerWidget::setBackgroundColor(int index)
+{
+    if(index == 0)
+        setStyleSheet("QFrame { background-image: default; }");
+    else
+        setStyleSheet(QString("QFrame { background-image: url(:/images/background%1.jpg); }").arg(index));
+}
+
+void SimulationViewerWidget::setFlyIcon(int index)
+{
+    currentIconName = QString(":/images/fly%1.png").arg(index + 1);
+    for(auto it = flies.begin(); it != flies.end(); it++)
+    {
+        (*it).flyWidget->setIcon(currentIconName);
     }
 }
 
@@ -44,7 +62,7 @@ void SimulationViewerWidget::addNewFly(int flyID, int x, int y, int stupidity)
     FlyEnvelope newFly;
     newFly.cellX = x;
     newFly.cellY = y;
-    newFly.flyWidget = new FlyIconWidget(flyID, double(stupidity) / maxStupidity, this);
+    newFly.flyWidget = new FlyIconWidget(flyID, double(stupidity) / maxStupidity, currentIconName, this);
     newFly.animation = new QPropertyAnimation();
     newFly.animation->setTargetObject(newFly.flyWidget);
     newFly.animation->setPropertyName("geometry");
@@ -73,7 +91,7 @@ void SimulationViewerWidget::paintEvent(QPaintEvent *event)
         return;
 
     QPainter painter(this);
-    painter.setPen(QPen(QBrush(QColor(Qt::black)), 5));
+    painter.setPen(QPen(QBrush(QColor(Qt::black)), 3));
     painter.drawRect(5, 5, width() - 10, height() - 10);
     for(int i = 0; i < fieldSize - 1; i++)
     {

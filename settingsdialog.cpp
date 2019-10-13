@@ -6,6 +6,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/images/fly6.png"));
 }
 
 SettingsDialog::~SettingsDialog()

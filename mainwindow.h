@@ -59,6 +59,10 @@ private slots:
 
     void on_statisticsButton_clicked();
 
+    void on_backgroundComboBox_currentIndexChanged(int index);
+
+    void on_flyIconComboBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
